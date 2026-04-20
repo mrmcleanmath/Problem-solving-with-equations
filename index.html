@@ -1,977 +1,1637 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Problem solving with equations — Mr. McLean Math</title>
-<style>
-  :root{
-    --bg:#ffffff;
-    --fg:#0b0b0b;
-    --muted:#5a5a5a;
-    --panel:#f4f6f8;
-    --accent:#2b7cff;
-    --ok:#22aa55;
-    --bad:#e03b3b;
-    --yellow:#f2b705;
-    --easy:#2ecc71;
-    --med:#f1c40f;
-    --hard:#e74c3c;
-    --rand:#6c5ce7;
-    --shadow:0 6px 16px rgba(0,0,0,0.12);
-    --radius:16px;
-    --radius-lg:22px;
-    --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-  }
-  [data-contrast="high"]{
-    --bg:#000000;
-    --fg:#ffffff;
-    --muted:#cbcbcb;
-    --panel:#111111;
-    --accent:#52a9ff;
-    --ok:#00e676;
-    --bad:#ff5252;
-    --yellow:#ffd740;
-    --shadow:none;
-  }
-  html, body { height: 100%; }
-  body{
-    margin:0;
-    background:var(--bg);
-    color:var(--fg);
-    font-family:var(--font);
-    line-height:1.45;
-    font-size:18px; /* projector-friendly */
-  }
-  .wrap{
-    max-width: 980px;
-    margin: 24px auto 60px;
-    padding: 0 16px;
-  }
-  header h1{
-    font-size: 34px;
-    margin: 8px 0 0;
-  }
-  header p{ color:var(--muted); margin-top:6px; }
-  .toolbar, .modebar{
-    display:flex; flex-wrap:wrap; gap:10px; align-items:center;
-    background:var(--panel); padding:12px; border-radius:var(--radius);
-    box-shadow:var(--shadow);
-  }
-  .toolbar .group{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-  .tag{
-    display:inline-flex; align-items:center; gap:6px;
-    padding:6px 10px; border-radius:999px; background:#fff; color:#333; box-shadow:var(--shadow);
-    cursor:pointer; user-select:none; border:2px solid transparent;
-  }
-  .tag[aria-pressed="true"]{ border-color:var(--accent); }
-  .pill{
-    padding:8px 14px; border-radius:999px; border:2px solid transparent; background:#fff; cursor:pointer;
-    box-shadow:var(--shadow); font-weight:600;
-  }
-  .pill.easy{ border-color:var(--easy); }
-  .pill.med{ border-color:var(--med); }
-  .pill.hard{ border-color:var(--hard); }
-  .pill.rand{ border-color:var(--rand); }
-  .pill.active{ background:var(--accent); color:#fff; border-color:var(--accent); }
-  .modebtn{ padding:10px 16px; border-radius:12px; border:2px solid var(--accent); background:#fff; cursor:pointer; font-weight:700; }
-  .modebtn.active{ background:var(--accent); color:#fff; }
-  .toggle{
-    display:inline-flex; align-items:center; gap:8px; cursor:pointer; user-select:none;
-  }
-  .toggle input{ width:22px; height:22px; }
-  .problem-card{
-    margin-top:18px; padding:18px; background:var(--panel); border-radius:var(--radius-lg); box-shadow:var(--shadow);
-  }
-  .statement{
-    font-size:26px; /* large for projector */
-    margin:0 0 14px;
-  }
-  .inputs{ display:flex; gap:14px; flex-wrap:wrap; margin:10px 0 4px; }
-  .inputs label{ font-weight:700; }
-  .inputs input{
-    font-size:24px; padding:10px 12px; min-width:160px;
-    border-radius:12px; border:2px solid #d7dbe2; outline:none; background:#fff;
-  }
-  .inputs input:focus{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(43,124,255,0.15); }
-  .controls{ display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-  .btn{
-    padding:12px 16px; border-radius:14px; border:none; background:var(--accent); color:#fff; cursor:pointer; font-weight:800;
-    box-shadow:var(--shadow);
-  }
-  .btn.secondary{ background:#fff; color:var(--fg); border:2px solid var(--accent); }
-  .btn.warn{ background:var(--bad); }
-  .feedback{
-    margin-top:10px; font-size:20px; font-weight:800;
-  }
-  .feedback .ok{ color:var(--ok); }
-  .feedback .bad{ color:var(--bad); }
-  .statusbar{
-    display:flex; gap:18px; flex-wrap:wrap; align-items:center;
-    margin-top:10px; color:var(--muted); font-size:16px;
-  }
-  .steps{
-    margin-top:10px; padding:12px; background:#fff; border-radius:12px; border:2px dashed #d7dbe2;
-  }
-  .steps h3{ margin:0 0 8px; font-size:18px; }
-  .row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-  .right{ margin-left:auto; }
-  .footer{
-    margin-top:28px; color:var(--muted); font-size:14px; text-align:center;
-  }
-  .summary{
-    margin-top:18px; padding:16px; background:var(--panel); border-radius:var(--radius);
-  }
-  details summary{ cursor:pointer; }
-  /* Worksheet */
-  .worksheet-card{
-    margin-top:18px; padding:18px; background:var(--panel); border-radius:var(--radius-lg); box-shadow:var(--shadow);
-  }
-  .ws-controls{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
-  .ws-item{ background:#fff; border-radius:12px; padding:12px; margin:10px 0; border:1px solid #e3e6ea; }
-  .ws-item h4{ margin:0 0 8px; }
-  .ws-ans{ margin-top:8px; display:none; }
-  .ws-ans.show{ display:block; }
-  .hint{ color:var(--muted); font-size:14px; }
-  mark.green{ background: #d3f9d8; padding:0 6px; border-radius:6px; }
-  mark.red{ background: #ffd6d6; padding:0 6px; border-radius:6px; }
-  .small{ font-size:14px; color:var(--muted); }
-  .sr-only{ position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0; }
-</style>
+  <meta charset="utf-8" />
+  <title>Problem Solving with Equations – Mr. McLean Math</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    :root{
+      --bg:#050814;
+      --card:#101528;
+      --card-soft:#151b33;
+      --accent:#ffb400;
+      --accent-soft:#ffd666;
+      --accent-hard:#ff7a3c;
+      --text:#f4f6ff;
+      --muted:#a3aedc;
+      --danger:#ff4b6b;
+      --correct:#3ac77a;
+      --border:#232a44;
+      --shadow:0 18px 40px rgba(0,0,0,0.55);
+      --input:#0a1020;
+      --chip:#1b2340;
+      --chip-active:#28335a;
+      --tag-easy:#1ea96a;
+      --tag-med:#f1b52c;
+      --tag-hard:#e05a3c;
+      --font-main:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    }
+    *{box-sizing:border-box;}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family:var(--font-main);
+      background:radial-gradient(circle at top,#1a2340 0,#050814 60%);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+    }
+    body.high-contrast{
+      --bg:#000;
+      --card:#000;
+      --card-soft:#000;
+      --text:#fff;
+      --muted:#ddd;
+      --border:#fff;
+      --chip:#111;
+      --chip-active:#333;
+    }
+    .app{
+      width:100%;
+      max-width:980px;
+      background:linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));
+      border-radius:24px;
+      padding:20px 18px 24px;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,0.06);
+    }
+    @media (min-width:768px){
+      .app{padding:24px 28px 30px;}
+    }
+    h1{
+      margin:0 0 4px;
+      font-size:1.4rem;
+      letter-spacing:.03em;
+    }
+    .subtitle{
+      font-size:.9rem;
+      color:var(--muted);
+      margin-bottom:14px;
+    }
+    .top-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:12px;
+    }
+    .mode-toggle{
+      display:inline-flex;
+      padding:2px;
+      border-radius:999px;
+      background:rgba(0,0,0,0.4);
+      border:1px solid var(--border);
+    }
+    .mode-btn{
+      border:none;
+      background:transparent;
+      color:var(--muted);
+      padding:6px 14px;
+      border-radius:999px;
+      font-size:.86rem;
+      cursor:pointer;
+    }
+    .mode-btn.active{
+      background:var(--accent);
+      color:#000;
+      font-weight:600;
+    }
+    .difficulty-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-bottom:8px;
+    }
+    .chip{
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:var(--chip);
+      padding:4px 10px;
+      font-size:.8rem;
+      color:var(--muted);
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .chip span.icon{font-size:.9rem;}
+    .chip.active{
+      background:var(--chip-active);
+      color:var(--text);
+      border-color:var(--accent-soft);
+    }
+    .chip.easy .icon{color:var(--tag-easy);}
+    .chip.medium .icon{color:var(--tag-med);}
+    .chip.hard .icon{color:var(--tag-hard);}
+    .chip.mixed .icon{color:var(--accent-soft);}
+    .controls-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:10px;
+    }
+    .pill-toggle{
+      display:flex;
+      align-items:center;
+      gap:4px;
+      padding:4px 10px;
+      border-radius:999px;
+      background:rgba(0,0,0,0.35);
+      border:1px solid var(--border);
+      font-size:.78rem;
+      color:var(--muted);
+    }
+    .pill-toggle input,
+    .pill-toggle select{
+      font-size:.78rem;
+      background:transparent;
+      border:none;
+      color:inherit;
+      outline:none;
+    }
+    .pill-toggle input[type="checkbox"]{
+      width:14px;
+      height:14px;
+      accent-color:var(--accent);
+      cursor:pointer;
+    }
+    .pill-toggle select{
+      cursor:pointer;
+    }
+    .main-grid{
+      display:grid;
+      gap:14px;
+    }
+    @media (min-width:900px){
+      .main-grid{
+        grid-template-columns:minmax(0,2.1fr) minmax(0,1.2fr);
+        align-items:flex-start;
+      }
+    }
+    .card{
+      background:var(--card);
+      border-radius:18px;
+      border:1px solid var(--border);
+      padding:14px 14px 16px;
+    }
+    .card h2{
+      margin:0 0 8px;
+      font-size:1rem;
+    }
+    .question-text{
+      font-size:.96rem;
+      line-height:1.5;
+      margin-bottom:10px;
+      white-space:pre-wrap;
+    }
+    .answer-fields{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .answer-field-group{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+    .answer-label{
+      font-size:.8rem;
+      color:var(--muted);
+    }
+    .answer-row{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      margin-bottom:6px;
+      flex-wrap:wrap;
+    }
+    .answer-input{
+      width:100%;
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:var(--input);
+      color:var(--text);
+      font-size:1rem;
+      outline:none;
+    }
+    .answer-input:focus{
+      border-color:var(--accent-soft);
+      box-shadow:0 0 0 1px rgba(255,255,255,0.08);
+    }
+    .answer-row .main-btn,
+    .answer-row .secondary-btn{
+      margin-top:2px;
+    }
+    button.main-btn{
+      border:none;
+      border-radius:10px;
+      padding:8px 14px;
+      font-size:.9rem;
+      font-weight:600;
+      cursor:pointer;
+      background:var(--accent);
+      color:#000;
+      min-width:80px;
+      transition:transform .05s ease, box-shadow .05s ease, background .15s;
+    }
+    button.main-btn:active{
+      transform:translateY(1px);
+      box-shadow:none;
+    }
+    button.main-btn[disabled]{
+      opacity:0.5;
+      cursor:default;
+    }
+    .secondary-btn{
+      border:none;
+      border-radius:999px;
+      padding:4px 10px;
+      font-size:.78rem;
+      cursor:pointer;
+      background:rgba(255,255,255,0.04);
+      color:var(--muted);
+      border:1px solid var(--border);
+    }
+    .secondary-btn:hover{
+      background:rgba(255,255,255,0.07);
+    }
+    .feedback{
+      margin-top:6px;
+      font-size:.88rem;
+      min-height:1.2em;
+    }
+    .feedback.correct{color:var(--correct);}
+    .feedback.incorrect{color:var(--danger);}
+    .correct-answer{
+      font-size:.82rem;
+      color:var(--muted);
+      margin-top:3px;
+      white-space:pre-wrap;
+    }
+    .steps{
+      margin-top:6px;
+      padding:8px 10px;
+      background:var(--card-soft);
+      border-radius:10px;
+      font-size:.82rem;
+      color:var(--muted);
+      white-space:pre-wrap;
+    }
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      font-size:.78rem;
+      border-radius:999px;
+      padding:2px 8px;
+      background:rgba(0,0,0,0.25);
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    .tag .dot{
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:var(--muted);
+    }
+    .tag.easy .dot{background:var(--tag-easy);}
+    .tag.medium .dot{background:var(--tag-med);}
+    .tag.hard .dot{background:var(--tag-hard);}
+    .stats-list{
+      list-style:none;
+      padding:0;
+      margin:6px 0 0;
+      font-size:.84rem;
+      color:var(--muted);
+    }
+    .stats-list li{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:2px 0;
+    }
+    .incorrect-list{
+      margin-top:6px;
+      max-height:190px;
+      overflow:auto;
+      border-top:1px dashed rgba(255,255,255,0.08);
+      padding-top:6px;
+      font-size:.8rem;
+    }
+    .incorrect-item{
+      margin-bottom:6px;
+      padding-bottom:4px;
+      border-bottom:1px dashed rgba(255,255,255,0.06);
+    }
+    .incorrect-item:last-child{
+      border-bottom:none;
+      padding-bottom:0;
+    }
+    .incorrect-q{
+      color:var(--text);
+    }
+    .incorrect-a{
+      color:var(--muted);
+      white-space:pre-wrap;
+    }
+    .footer{
+      margin-top:10px;
+      font-size:.8rem;
+      color:var(--muted);
+      text-align:right;
+      opacity:0.8;
+    }
+    .worksheet-controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:8px;
+    }
+    .worksheet-output{
+      max-height:340px;
+      overflow:auto;
+      background:var(--card-soft);
+      border-radius:12px;
+      padding:10px;
+      font-size:.86rem;
+    }
+    .worksheet-output h3{
+      margin:0 0 6px;
+      font-size:.9rem;
+    }
+    .worksheet-output ol{
+      margin:4px 0 8px 18px;
+      padding:0;
+    }
+    .worksheet-output li{
+      margin-bottom:4px;
+      white-space:pre-wrap;
+    }
+    .answer-key{
+      border-top:1px solid rgba(255,255,255,0.08);
+      padding-top:6px;
+      margin-top:6px;
+    }
+    .answer-key h4{
+      margin:0 0 4px;
+      font-size:.86rem;
+    }
+    .hidden{display:none;}
+    .timer-display{
+      font-size:.82rem;
+      color:var(--muted);
+      min-width:48px;
+      text-align:center;
+    }
+    .timer-display.active{
+      color:var(--accent-soft);
+    }
+    .dev-banner{
+      font-size:.78rem;
+      margin-top:6px;
+      color:var(--accent-soft);
+    }
+  </style>
 </head>
-<body data-contrast="normal">
-<div class="wrap">
-  <header>
-    <h1>Problem solving with equations</h1>
-    <p>Read the problem. Translate to an equation. Type the answer(s). <strong>On correct, it shows “Correct!” and waits</strong> — press Enter or click Next.</p>
-  </header>
+<body>
+  <div class="app" aria-label="Problem Solving with Equations game">
+    <div class="top-row">
+      <div>
+        <h1>Problem Solving with Equations</h1>
+        <div class="subtitle">Write and solve an equation for each word problem.</div>
+      </div>
+      <div class="mode-toggle" aria-label="Switch between Game and Worksheet mode">
+        <button class="mode-btn active" data-mode="game">Game mode</button>
+        <button class="mode-btn" data-mode="worksheet">Worksheet mode</button>
+      </div>
+    </div>
 
-  <div class="toolbar" role="toolbar" aria-label="Mode and Difficulty">
-    <div class="group" aria-label="Modes">
-      <button class="modebtn active" data-mode="game" aria-pressed="true">Game</button>
-      <button class="modebtn" data-mode="worksheet" aria-pressed="false">Worksheet</button>
+    <div class="difficulty-row" aria-label="Select difficulty">
+      <button class="chip easy active" data-diff="easy">
+        <span class="icon">🟢</span><span>Easy</span>
+      </button>
+      <button class="chip medium" data-diff="medium">
+        <span class="icon">🟡</span><span>Medium</span>
+      </button>
+      <button class="chip hard" data-diff="hard">
+        <span class="icon">🔴</span><span>Hard</span>
+      </button>
+      <button class="chip mixed" data-diff="mixed">
+        <span class="icon">🎲</span><span>Mixed</span>
+      </button>
     </div>
-    <div class="group" aria-label="Difficulty">
-      <button class="pill easy active" data-diff="easy" title="Easy (🟢)">🟢 Easy</button>
-      <button class="pill med" data-diff="med" title="Medium (🟡)">🟡 Medium</button>
-      <button class="pill hard" data-diff="hard" title="Hard (🔴)">🔴 Hard</button>
-      <button class="pill rand" data-diff="rand" title="Random (🎲)">🎲 Random</button>
+
+    <div class="controls-row">
+      <div class="pill-toggle">
+        <input id="soundToggle" type="checkbox" checked>
+        <label for="soundToggle">Sound</label>
+      </div>
+      <div class="pill-toggle">
+        <input id="contrastToggle" type="checkbox">
+        <label for="contrastToggle">High contrast</label>
+      </div>
+      <div class="pill-toggle">
+        <input id="timerToggle" type="checkbox">
+        <label for="timerToggle">Timer</label>
+        <select id="timerSelect">
+          <option value="30">30 s</option>
+          <option value="60" selected>60 s</option>
+          <option value="90">90 s</option>
+          <option value="120">120 s</option>
+        </select>
+        <span class="timer-display" id="timerDisplay">--</span>
+      </div>
     </div>
-    <div class="group right">
-      <label class="toggle"><input type="checkbox" id="toggleSound" checked> Sound</label>
-      <label class="toggle"><input type="checkbox" id="toggleTimer"> Timer</label>
-      <select id="timerSelect" aria-label="Timer length" disabled>
-        <option value="30">30s</option>
-        <option value="60" selected>60s</option>
-        <option value="90">90s</option>
-        <option value="120">120s</option>
-      </select>
-      <label class="toggle"><input type="checkbox" id="toggleContrast"> High contrast</label>
-      <label class="toggle"><input type="checkbox" id="toggleShowEquation"> Equation shown (after submit)</label>
+
+    <div class="main-grid">
+      <section class="card" id="gameCard" aria-live="polite">
+        <div class="tag easy" id="difficultyTag">
+          <span class="dot"></span>
+          <span id="difficultyLabel">Easy question</span>
+        </div>
+        <h2>Current question</h2>
+        <div class="question-text" id="questionText">Loading question…</div>
+
+        <div class="answer-fields" id="answerFields"></div>
+
+        <div class="answer-row">
+          <button id="submitBtn" class="main-btn">Submit</button>
+          <button id="nextBtn" class="secondary-btn" disabled>Next</button>
+        </div>
+
+        <div class="feedback" id="feedback" aria-live="assertive"></div>
+        <div class="correct-answer" id="correctAnswer"></div>
+        <button id="showStepsBtn" class="secondary-btn hidden">Show steps</button>
+        <div class="steps hidden" id="stepsPanel"></div>
+      </section>
+
+      <section class="card">
+        <h2>Session summary</h2>
+        <ul class="stats-list">
+          <li><span>Questions attempted</span><span id="statTotal">0</span></li>
+          <li><span>Correct</span><span id="statCorrect">0</span></li>
+          <li><span>Accuracy</span><span id="statAccuracy">0%</span></li>
+          <li><span>Current streak</span><span id="statStreak">0</span></li>
+          <li><span>Best streak</span><span id="statBestStreak">0</span></li>
+          <li><span>Score</span><span id="statScore">0</span></li>
+        </ul>
+        <button id="toggleIncorrectBtn" class="secondary-btn" style="margin-top:6px;">Show incorrect questions</button>
+        <div id="incorrectPanel" class="incorrect-list hidden"></div>
+
+        <div id="worksheetSection" class="hidden" style="margin-top:12px;">
+          <h2>Worksheet generator</h2>
+          <div class="worksheet-controls">
+            <div class="pill-toggle">
+              <span>Questions:</span>
+              <select id="worksheetCount">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="15" selected>15</option>
+              </select>
+            </div>
+            <button id="generateWorksheetBtn" class="main-btn">Generate</button>
+            <button id="toggleAnswersBtn" class="secondary-btn">Reveal answers</button>
+          </div>
+          <div class="worksheet-output" id="worksheetOutput">
+            <h3>Worksheet</h3>
+            <p>Choose a difficulty and click Generate to create a worksheet.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="footer">
+      Created by Mr. McLean Math.
+      <span id="devBanner" class="dev-banner hidden">Dev mode (?dev=1) enabled</span>
     </div>
   </div>
 
-  <!-- GAME -->
-  <section id="gameSection" class="problem-card" aria-live="polite">
-    <div class="row">
-      <div>
-        <div class="small">Current difficulty: <span id="diffLabel">🟢 Easy</span></div>
-      </div>
-      <div class="right small">
-        <span id="seedInfo"></span>
-      </div>
-    </div>
-
-    <p class="statement" id="statement">Press “New Problem” to begin.</p>
-
-    <div class="inputs" id="inputs"></div>
-
-    <div class="controls">
-      <button class="btn" id="submitBtn" aria-label="Submit answer (Enter)">Submit</button>
-      <button class="btn secondary" id="nextBtn" aria-label="Next problem (Enter after Correct!)" disabled>Next</button>
-      <button class="btn secondary" id="newBtn">New Problem</button>
-      <button class="btn secondary" id="clearBtn">Clear (Esc)</button>
-      <button class="btn warn" id="giveUpBtn">Show Steps</button>
-    </div>
-
-    <div class="feedback" id="feedback" aria-live="assertive"></div>
-
-    <div id="equationReveal" class="steps" style="display:none;">
-      <h3>Equation</h3>
-      <div id="equationText"></div>
-    </div>
-
-    <div class="steps" id="steps" style="display:none;">
-      <h3>Worked Steps</h3>
-      <div id="stepsBody"></div>
-    </div>
-
-    <div class="statusbar" aria-live="polite">
-      <div>Score: <strong id="score">0</strong></div>
-      <div>Streak: <strong id="streak">0</strong></div>
-      <div>Accuracy: <strong id="accuracy">–</strong></div>
-      <div id="timerBox" style="display:none;">Time: <strong id="timeLeft">60</strong>s</div>
-    </div>
-
-    <div class="summary" id="summary" hidden>
-      <details open>
-        <summary>Session Summary</summary>
-        <div>Total: <span id="sumTotal">0</span> • Correct: <span id="sumCorrect">0</span> • Accuracy: <span id="sumAcc">0%</span> • Score: <span id="sumScore">0</span> • Longest Streak: <span id="sumStreak">0</span></div>
-        <details>
-          <summary>Incorrect items (click to review)</summary>
-          <div id="incorrectList"></div>
-        </details>
-      </details>
-    </div>
-  </section>
-
-  <!-- WORKSHEET -->
-  <section id="wsSection" class="worksheet-card" hidden>
-    <div class="ws-controls">
-      <label>Set size:
-        <select id="wsSize">
-          <option value="5">5</option>
-          <option value="10" selected>10</option>
-          <option value="15">15</option>
-        </select>
-      </label>
-      <button class="btn" id="wsGenerate">Generate Worksheet</button>
-      <button class="btn secondary" id="wsRevealAll">Reveal all</button>
-      <button class="btn secondary" id="wsHideAll">Hide all</button>
-      <label class="toggle"><input type="checkbox" id="wsShowEq"> Show equations in answers</label>
-    </div>
-    <div class="ws-header hint">Instruction: Solve each by writing the equation and the final answer.</div>
-    <div id="wsList"></div>
-  </section>
-
-  <div class="footer">Created by Mr. McLean Math.</div>
-</div>
-
-<script>
-/** ===================== Utilities ===================== **/
-const $ = sel => document.querySelector(sel);
-const $$ = sel => Array.from(document.querySelectorAll(sel));
-
-/* PRNG with seeding (Mulberry32) */
-function mulberry32(a){ return function() { let t = a += 0x6D2B79F5; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; } }
-function seededShuffle(arr, rnd){ const a = arr.slice(); for (let i=a.length-1;i>0;i--){ const j = Math.floor(rnd()* (i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
-
-function getParam(name){ const u = new URL(location.href); return u.searchParams.get(name); }
-let seedParam = getParam('seed');
-let devMode = getParam('dev') === '1';
-let seed = seedParam ? hashStr(seedParam) : Math.floor(Math.random()*1e9);
-let rng = mulberry32(seed);
-function hashStr(s){ let h=2166136261>>>0; for (let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h,16777619); } return h>>>0; }
-
-function randInt(min,max){ return Math.floor(rng()*(max-min+1))+min; }
-function choice(arr){ return arr[Math.floor(rng()*arr.length)]; }
-
-/* Number formatting: spaces as thousand sep */
-function formatSpaces(n){
-  const s = (typeof n === 'number' ? n.toString() : String(n));
-  if (s.includes('.') || s.includes(',')) {
-    const parts = s.replace(',', '.').split('.');
-    return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ') + (parts[1] ? ',' + parts[1] : '');
-  }
-  return s.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-}
-/* Input parsing: accept spaces and either . or , as decimal; allow only .5 or ,5 when allowed */
-function parseUserNumber(str, allowHalf=false){
-  if (typeof str !== 'string') str = String(str ?? '');
-  let s = str.trim().replace(/\s+/g,'');
-  if (s === '') return null;
-  s = s.replace(',', '.');
-  if (!allowHalf && s.includes('.')) return null;
-  if (allowHalf && s.includes('.')){
-    const val = Number(s);
-    if (!isFinite(val)) return null;
-    if (Math.abs(val - Math.round(val)) < 1e-9) return Math.round(val);
-    // ensure N.5 only
-    const twice = val*2;
-    if (Math.abs(twice - Math.round(twice))<1e-9 && Math.round(twice) % 2 === 1) return val;
-    return null;
-  }
-  const n = Number(s);
-  if (!isFinite(n)) return null;
-  return Math.round(n);
-}
-
-/* ARIA live helper */
-function announce(el, msg){ el.textContent = msg; }
-
-/* Simple beeps via WebAudio */
-let audioCtx = null;
-function beep(freq=880, dur=120){
-  if (!$('#toggleSound').checked) return;
-  try{
-    if (!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type='sine'; osc.frequency.value=freq;
-    gain.gain.value=0.05;
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start();
-    setTimeout(()=>{ osc.stop(); }, dur);
-  }catch(e){}
-}
-
-/** ===================== Banks (Names • Items • Situations) ===================== **/
-// Names (international)
-const NAME_BANK = [
-  'Sofia','Mateo','Aisha','Viktor','Maya','Daniel','Priya','Lucas','Emma','Noah',
-  'Zara','Hugo','Lina','Omar','Julia','Elias','Ava','Karim','Nora','Felix',
-  'Selma','Leon','Mira','Theo','Amira','Jonas','Ivy','Kenji','Rosa','Gabriel',
-  'Anisa','Marco','Yara','Niklas','Tara','Arjun','Elin','Samir','Isla','Milan',
-  'Paula','Diego','Ravi','Kira','Eva','Tom','Marek','Nina','Sven','Lukas'
-];
-function pairNames(){
-  const arr = seededShuffle(NAME_BANK, rng);
-  return [arr[0], arr[1]];
-}
-
-// Currency items (singular/plural for “buy N items at p kr each”)
-const CURRENCY_ITEMS = [
-  {sing:'slice of cheesecake', plur:'slices of cheesecake'},
-  {sing:'muffin', plur:'muffins'},
-  {sing:'sandwich', plur:'sandwiches'},
-  {sing:'juice box', plur:'juice boxes'},
-  {sing:'notebook', plur:'notebooks'},
-  {sing:'pen', plur:'pens'},
-  {sing:'eraser', plur:'erasers'},
-  {sing:'sticker pack', plur:'sticker packs'},
-  {sing:'apple', plur:'apples'},
-  {sing:'cookie', plur:'cookies'},
-  {sing:'metro ticket', plur:'metro tickets'},
-  {sing:'bus ticket', plur:'bus tickets'}
-];
-
-// Count items (no currency): coins/presents/stickers/etc.
-const COUNT_ITEMS = [
-  {sing:'coin', plur:'coins'},
-  {sing:'present', plur:'presents'},
-  {sing:'sticker', plur:'stickers'},
-  {sing:'marble', plur:'marbles'},
-  {sing:'bead', plur:'beads'},
-  {sing:'shell', plur:'shells'},
-  {sing:'trading card', plur:'trading cards'},
-  {sing:'balloon', plur:'balloons'}
-];
-
-// Snack items (for small purchases in hard spend problems)
-const SNACK_ITEMS = [
-  'a bun','a pretzel','a juice','a coffee','a snack','a sandwich','a cookie'
-];
-
-// Situations (light flavor text hooks)
-const SITUATIONS = [
-  'at the school café','at the book fair','at the station kiosk','during break',
-  'after practice','on the way home','at the corner shop','at the stadium'
-];
-
-function itemPhrase(item, n){
-  return n===1 ? `1 ${item.sing}` : `${n} ${item.plur}`;
-}
-
-/** ===================== Problem Templates ===================== **/
-/*
- Each generator returns:
- {
-   text: "...",
-   inputs: [ { label: 'x' or name, key:'a' }, ... ],
-   answer: { a: number, b?: number },
-   equation: "equation text",
-   steps: ["...", "...", "..."],
-   allowHalf: boolean
- }
- Constraints: Easy → ALL shown numbers ≤ 100 (statement, equation, steps)
-*/
-
-/* Helper to ensure all numbers displayed in Easy are ≤ 100 */
-function allEasyNumsOK(arr){ return arr.every(v => Math.abs(v) <= 100); }
-
-function genEasy(){
-  // choose one of several easy templates; enforce ≤ 100 everywhere displayed
-  const type = choice(['mulSub','divAdd','buyNitems']);
-  if (type==='mulSub'){
-    // "Multiply number by m, subtract s → r"
-    for (let tries=0; tries<200; tries++){
-      const m = choice([2,3,4,5]);
-      const x = randInt(1,50);                  // solution
-      const s = randInt(1,10);
-      const r = m*x - s;
-      const eqRight = r + s;                    // appears in step
-      if (r <= 0) continue;
-      if (!allEasyNumsOK([m, s, r, eqRight, x])) continue;
-      return {
-        text:`We multiply a number by ${m}. Then we subtract ${s} and get ${formatSpaces(r)}. What is the number?`,
-        inputs:[{label:'Number', key:'a'}],
-        answer:{a:x},
-        equation:`${m}·x − ${s} = ${formatSpaces(r)}`,
-        steps:[`Add ${s} to both sides: ${m}·x = ${formatSpaces(eqRight)}`,
-               `Divide by ${m}: x = ${formatSpaces(x)}`],
-        allowHalf:false
-      };
+  <script>
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-  }
-  if (type==='divAdd'){
-    // Age/d + a = t ; choose base so all shown numbers ≤ 100
-    for (let tries=0; tries<200; tries++){
-      const d = choice([2,3,4,5]);
-      const base = randInt(2,20);              // age = base*d ≤ 100
-      const age2 = base*d;
-      const a = randInt(2,12);
-      const t2 = base + a;
-      if (!allEasyNumsOK([d, base, age2, a, t2])) continue;
-      return {
-        text:`When I divide my age by ${d} and then add ${a}, I get ${formatSpaces(t2)}. What is my age?`,
-        inputs:[{label:'Age (years)', key:'a'}],
-        answer:{a:age2},
-        equation:`(age)/${d} + ${a} = ${formatSpaces(t2)}`,
-        steps:[`Subtract ${a}: age/${d} = ${formatSpaces(t2 - a)}`,
-               `Multiply by ${d}: age = ${formatSpaces(age2)}`],
-        allowHalf:false
-      };
+
+    function choice(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
     }
-  }
-  // Buy N currency items + fixed extra small purchase
-  for (let tries=0; tries<300; tries++){
-    const who = choice(NAME_BANK);
-    const situ = choice(SITUATIONS);
-    const paper = choice([10,15,20,25,30]);           // small fixed purchase
-    const item = choice(CURRENCY_ITEMS);
-    const n = choice([3,4,5]);                        // number of items
-    // pick per-item price so total ≤ 100
-    const price = randInt(5,30);
-    const total = paper + n*price;
-    if (total > 100) continue;
-    if (!allEasyNumsOK([paper, n, price, total])) continue;
-    return {
-      text:`${who} bought ${itemPhrase(item, n)} and also a newspaper for ${formatSpaces(paper)} kr ${situ!==''?` ${situ}`:''}. The total was ${formatSpaces(total)} kr. How much did one ${item.sing} cost (kr)?`,
-      inputs:[{label:`Price per ${item.sing} (kr)`, key:'a'}],
-      answer:{a:price},
-      equation:`${paper} + ${n}·p = ${formatSpaces(total)}`,
-      steps:[`Subtract ${formatSpaces(paper)}: ${n}·p = ${formatSpaces(total - paper)}`,
-             `Divide by ${n}: p = ${formatSpaces(price)} kr`],
-      allowHalf:false
-    };
-  }
-  // Fallback (shouldn’t happen)
-  return {
-    text:`We multiply a number by 2. Then we subtract 5 and get 9. What is the number?`,
-    inputs:[{label:'Number', key:'a'}],
-    answer:{a:7},
-    equation:`2·x − 5 = 9`,
-    steps:[`Add 5: 2·x = 14`,`Divide by 2: x = 7`],
-    allowHalf:false
-  };
-}
 
-function genMedium(){
-  const type = choice(['mulSub','threeTimes','pairSumMultiple']);
-  if (type==='mulSub'){
-    const m = randInt(3,7);
-    const x = randInt(5,60);
-    const b = randInt(5,20);
-    const r = m*x - b;
-    return {
-      text:`If I take a number and multiply it by ${m}, and then subtract ${b}, I get ${formatSpaces(r)}. What is the number?`,
-      inputs:[{label:'Number', key:'a'}],
-      answer:{a:x},
-      equation:`${m}·x − ${b} = ${formatSpaces(r)}`,
-      steps:[`Add ${b}: ${m}·x = ${formatSpaces(r + b)}`,
-             `Divide by ${m}: x = ${formatSpaces(x)}`],
-      allowHalf:false
-    };
-  }
-  if (type==='threeTimes'){
-    const [A,B] = pairNames();
-    const b = randInt(10,150);
-    const a = 3*b;
-    const total = a + b;
-    const item = choice(COUNT_ITEMS);
-    return {
-      text:`${A} has three times as many ${item.plur} as ${B}. Together they have ${formatSpaces(total)} ${item.plur}. How many does each have?`,
-      inputs:[{label:`${A}`, key:'a'}, {label:`${B}`, key:'b'}],
-      answer:{a:a, b:b},
-      equation:`Let ${B}=x. Then ${A}=3x and 3x + x = ${formatSpaces(total)}`,
-      steps:[`4x = ${formatSpaces(total)}`,
-             `x = ${formatSpaces(b)} (for ${B}), so ${A} = 3x = ${formatSpaces(a)}.`],
-      allowHalf:false
-    };
-  }
-  const [A,B] = pairNames();
-  const k = choice([2,3,4]);
-  const b = randInt(8,120);
-  const a = k*b;
-  const total = a+b;
-  const item = choice(COUNT_ITEMS);
-  return {
-    text:`${A} has ${k} times as many ${item.plurs ?? item.plur} as ${B}. Together they have ${formatSpaces(total)} ${item.plur}. How many does each have?`,
-    inputs:[{label:`${A}`, key:'a'}, {label:`${B}`, key:'b'}],
-    answer:{a:a, b:b},
-    equation:`Let ${B}=x, ${A}=${k}x; ${k}x + x = ${formatSpaces(total)}`,
-    steps:[`${k+1}x = ${formatSpaces(total)}`,
-           `x = ${formatSpaces(b)}, so ${A} = ${k}x = ${formatSpaces(a)}.`],
-      allowHalf:false
-  };
-}
-
-function genHard(){
-  const type = choice(['ageBacksolve','piecewiseSpend','sumDiff','multipleTotal','history','halfSpendPlusFee']);
-  if (type==='ageBacksolve'){
-    const person = choice(NAME_BANK);
-    const cajsaAge = choice([3,4,5,6,7,8,9,10,11,12]);
-    const gf = (cajsaAge + 6) * 7; // integer
-    return {
-      text:`If you divide your grandfather’s age by 7 and then subtract 6, you get ${person}’s age. When ${person} is ${formatSpaces(cajsaAge)} years old, how old is grandfather?`,
-      inputs:[{label:'Grandfather (years)', key:'a'}],
-      answer:{a:gf},
-      equation:`gf/7 − 6 = ${formatSpaces(cajsaAge)}`,
-      steps:[`Add 6: gf/7 = ${formatSpaces(cajsaAge+6)}`,
-             `Multiply by 7: gf = ${formatSpaces(gf)} years.`],
-      allowHalf:false
-    };
-  }
-  if (type==='piecewiseSpend'){
-    // Start x, spend one-third on ticket, then buy snack cost c, left L
-    const snack = choice(SNACK_ITEMS);
-    const bun = randInt(20,80);
-    const left = randInt(120,400);
-    let x = 1.5*(left + bun); // may be .5
-    if (Math.abs(x*2 - Math.round(x*2))>1e-9) return genHard();
-    return {
-      text:`${choice(NAME_BANK)} spent one third of the money on a train ticket, then bought ${snack} for ${formatSpaces(bun)} kr, and had ${formatSpaces(left)} kr left. How much money was there to start with?`,
-      inputs:[{label:'Start (kr)', key:'a'}],
-      answer:{a:x},
-      equation:`x − x/3 − ${bun} = ${formatSpaces(left)}`,
-      steps:[`x − x/3 = (2/3)x. So (2/3)x − ${bun} = ${formatSpaces(left)}`,
-             `(2/3)x = ${formatSpaces(left + bun)}`,
-             `x = (3/2)·${formatSpaces(left + bun)} = ${formatSpaces(x)} kr.`],
-      allowHalf:true
-    };
-  }
-  if (type==='sumDiff'){
-    const [A,B] = pairNames();
-    const d = choice([9,11,13,15,17,19,21,23,25]);
-    const y = randInt(10,150);
-    const a = y + d;
-    const S = a + y;
-    const item = choice(COUNT_ITEMS);
-    return {
-      text:`${A} and ${B} have ${formatSpaces(S)} ${item.plur} together. ${A} has ${formatSpaces(d)} more than ${B}. How many does each one have?`,
-      inputs:[{label:`${A}`, key:'a'}, {label:`${B}`, key:'b'}],
-      answer:{a:a, b:y},
-      equation:`Let ${B}=y, ${A}=y+${d}; y+(y+${d}) = ${formatSpaces(S)}`,
-      steps:[`2y + ${d} = ${formatSpaces(S)} → 2y = ${formatSpaces(S - d)}`,
-             `y = ${formatSpaces(y)}, so ${A} = y + ${formatSpaces(d)} = ${formatSpaces(a)}.`],
-      allowHalf:false
-    };
-  }
-  if (type==='multipleTotal'){
-    const [A,B] = pairNames();
-    const k = choice([4,5]); // harder multiples
-    const b = randInt(6,120);
-    const a = k*b;
-    const T = a+b;
-    const item = choice(COUNT_ITEMS);
-    return {
-      text:`${A} has ${k} times as many ${item.plur} as ${B}. Together, they have ${formatSpaces(T)} ${item.plur}. How many does each have?`,
-      inputs:[{label:`${A}`, key:'a'}, {label:`${B}`, key:'b'}],
-      answer:{a:a, b:b},
-      equation:`Let ${B}=x, ${A}=${k}x; ${k}x + x = ${formatSpaces(T)}`,
-      steps:[`${k+1}x = ${formatSpaces(T)} → x = ${formatSpaces(b)}`,
-             `So ${A} = ${k}x = ${formatSpaces(a)}.`],
-      allowHalf:false
-    };
-  }
-  if (type==='history'){
-    const yearA = 2010, yearB = 1979;
-    const m1979 = randInt(1,60);
-    const women2010 = 90*m1979 + 15;
-    return {
-      text:`If you multiply the number of women who participated in ${yearB} by 90 and then add 15, you get the number of women in ${yearA}. If there were ${formatSpaces(women2010)} women in ${yearA}, how many participated in ${yearB}?`,
-      inputs:[{label:`${yearB} women`, key:'a'}],
-      answer:{a:m1979},
-      equation:`${yearA} = 90·w_${yearB} + 15`,
-      steps:[`Subtract 15: 90·w = ${formatSpaces(women2010 - 15)}`,
-             `Divide by 90: w = ${formatSpaces(m1979)}.`],
-      allowHalf:false
-    };
-  }
-  // Half spent + fee total spent known
-  const fee = randInt(100,1500);
-  const totalSpent = randInt(400,5000);
-  let start = 2*(totalSpent - fee);
-  if (start <= 0) return genHard();
-  const who = choice(NAME_BANK);
-  return {
-    text:`${who} saved money to run a race. They spent half on shoes and then paid a registration fee. Altogether they spent ${formatSpaces(totalSpent)} kr. The registration fee was ${formatSpaces(fee)} kr. How much did they save?`,
-    inputs:[{label:'Saved (kr)', key:'a'}],
-    answer:{a:start},
-    equation:`x/2 + ${formatSpaces(fee)} = ${formatSpaces(totalSpent)}`,
-    steps:[`Subtract ${formatSpaces(fee)}: x/2 = ${formatSpaces(totalSpent - fee)}`,
-           `Multiply by 2: x = ${formatSpaces(start)} kr.`],
-    allowHalf:false
-  };
-}
-
-/* Dispatcher per difficulty */
-function makeProblem(diff){
-  if (diff==='easy') return genEasy();
-  if (diff==='med') return genMedium();
-  if (diff==='hard') return genHard();
-  const pick = choice(['easy','med','hard']);
-  return makeProblem(pick);
-}
-
-/** ===================== State ===================== **/
-let difficulty = 'easy';
-let mode = 'game';
-let current = null;
-let score = 0, streak = 0, bestStreak = 0;
-let total = 0, correct = 0;
-let incorrectLog = [];
-let timer = null, timeRemain = 60, timerActive = false;
-
-/** ===================== UI Bindings ===================== **/
-function setDifficulty(d){
-  difficulty = d;
-  $$('.pill').forEach(b => b.classList.remove('active'));
-  const map = {easy:'🟢 Easy', med:'🟡 Medium', hard:'🔴 Hard', rand:'🎲 Random'};
-  $(`.pill.${d==='easy'?'easy':d==='med'?'med':d==='hard'?'hard':'rand'}`).classList.add('active');
-  $('#diffLabel').textContent = map[d];
-}
-$$('.pill').forEach(b=>{
-  b.addEventListener('click', ()=>{
-    setDifficulty(b.dataset.diff);
-  });
-});
-
-$$('.modebtn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    $$('.modebtn').forEach(x=>{ x.classList.remove('active'); x.setAttribute('aria-pressed','false'); });
-    btn.classList.add('active'); btn.setAttribute('aria-pressed','true');
-    mode = btn.dataset.mode;
-    if (mode==='game'){ $('#gameSection').hidden=false; $('#wsSection').hidden=true; }
-    else { $('#gameSection').hidden=true; $('#wsSection').hidden=false; }
-  });
-});
-
-$('#toggleTimer').addEventListener('change', ()=>{
-  const on = $('#toggleTimer').checked;
-  $('#timerSelect').disabled = !on;
-  $('#timerBox').style.display = on ? '' : 'none';
-  timerActive = on;
-  if (!on) stopTimer();
-});
-$('#timerSelect').addEventListener('change', ()=>{ if (timerActive) startTimer(); });
-$('#toggleContrast').addEventListener('change', ()=>{
-  document.body.setAttribute('data-contrast', $('#toggleContrast').checked ? 'high' : 'normal');
-});
-$('#toggleShowEquation').addEventListener('change', ()=>{
-  // handled after submit
-});
-
-$('#newBtn').addEventListener('click', ()=> newProblem());
-$('#clearBtn').addEventListener('click', ()=> clearInputs());
-$('#submitBtn').addEventListener('click', ()=> submitAnswer());
-$('#nextBtn').addEventListener('click', ()=> nextProblem());
-$('#giveUpBtn').addEventListener('click', ()=> showSteps());
-
-document.addEventListener('keydown', (e)=>{
-  if (e.key === 'Enter'){
-    if ($('#nextBtn').disabled){
-      submitAnswer();
-    } else {
-      nextProblem();
+    function formatNumber(num) {
+      if (typeof num !== "number" || !isFinite(num)) return String(num);
+      const sign = num < 0 ? "-" : "";
+      const abs = Math.abs(num);
+      const fixed = Number.isInteger(abs) ? abs.toString() : abs.toString();
+      const parts = fixed.split(".");
+      let intPart = parts[0];
+      const frac = parts.length > 1 ? "." + parts[1] : "";
+      const regex = /\B(?=(\d{3})+(?!\d))/g;
+      intPart = intPart.replace(regex, " ");
+      return sign + intPart + frac;
     }
-  } else if (e.key === 'Escape'){
-    clearInputs();
-  }
-});
 
-/** ===================== Timer ===================== **/
-function startTimer(){
-  stopTimer();
-  timeRemain = parseInt($('#timerSelect').value,10);
-  $('#timeLeft').textContent = timeRemain;
-  timer = setInterval(()=>{
-    timeRemain -= 1;
-    if (timeRemain < 0){ timeRemain = 0; }
-    $('#timeLeft').textContent = timeRemain;
-    if (timeRemain === 0){
-      stopTimer();
-      announce($('#feedback'), '✖ Time up');
-      $('#feedback').innerHTML = `<span class="bad">✖ Time up</span>`;
-      beep(240,120);
-      $('#giveUpBtn').focus();
+    function parseAnswer(value) {
+      if (value == null) return NaN;
+      const s = String(value)
+        .trim()
+        .replace(/\u00A0/g, " ")
+        .replace(/\s+/g, "")
+        .replace(",", ".");
+      if (s === "") return NaN;
+      return Number(s);
     }
-  }, 1000);
-}
-function stopTimer(){ if (timer){ clearInterval(timer); timer=null; } }
 
-/** ===================== Game Flow ===================== **/
-function newProblem(){
-  const diff = (difficulty==='rand' ? choice(['easy','med','hard']) : difficulty);
-  current = makeProblem(diff);
-  // Render
-  $('#statement').textContent = current.text;
-  const inputsDiv = $('#inputs');
-  inputsDiv.innerHTML = '';
-  if (!current.inputs || current.inputs.length===1){
-    const label = current.inputs ? current.inputs[0].label : 'Answer';
-    inputsDiv.appendChild(makeInput(label, 'a'));
-  } else {
-    current.inputs.forEach(inp=>{
-      inputsDiv.appendChild(makeInput(inp.label, inp.key));
-    });
-  }
-  $('#feedback').textContent = '';
-  $('#steps').style.display='none';
-  $('#equationReveal').style.display='none';
-  $('#equationText').textContent = '';
-  $('#stepsBody').innerHTML = '';
-  $('#nextBtn').disabled = true;
-  if (timerActive) startTimer();
-  $('#summary').hidden = (total===0);
-  const first = inputsDiv.querySelector('input'); if (first) first.focus();
-}
-
-function makeInput(label, key){
-  const wrap = document.createElement('div');
-  const id = 'inp_'+key;
-  const lab = document.createElement('label');
-  lab.setAttribute('for', id);
-  lab.textContent = label;
-  const input = document.createElement('input');
-  input.id = id; input.dataset.key = key; input.inputMode = 'decimal';
-  input.setAttribute('aria-label', label);
-  wrap.appendChild(lab);
-  wrap.appendChild(input);
-  return wrap;
-}
-
-function clearInputs(){
-  $$('#inputs input').forEach(i=> i.value='');
-  $('#feedback').textContent='';
-  $('#steps').style.display='none';
-  $('#equationReveal').style.display='none';
-  $('#equationText').textContent='';
-  $('#stepsBody').innerHTML='';
-}
-
-function showEquationIfEnabled(){
-  if ($('#toggleShowEquation').checked && current){
-    $('#equationText').textContent = current.equation;
-    $('#equationReveal').style.display='block';
-  }
-}
-
-function showSteps(){
-  if (!current) return;
-  const list = current.steps.map(s=> `<div>• ${s}</div>`).join('');
-  $('#stepsBody').innerHTML = list;
-  $('#steps').style.display='block';
-  showEquationIfEnabled();
-}
-
-function submitAnswer(){
-  if (!current) return;
-  const allowHalf = !!current.allowHalf;
-  const answers = {};
-  const user = {};
-  let okAll = true;
-  for (const inp of $$('#inputs input')){
-    const key = inp.dataset.key;
-    const val = parseUserNumber(inp.value, allowHalf);
-    user[key] = inp.value;
-    if (val===null){
-      okAll = false; break;
+    function formatAnswerList(problem) {
+      return problem.answers.map(a => `${a.label}: ${formatNumber(a.value)}`).join("\n");
     }
-    answers[key] = val;
-  }
-  if (!okAll){
-    $('#feedback').innerHTML = `<span class="bad">✖ Please enter a valid number${allowHalf?' (integers or .5 only)':''}.</span>`;
-    beep(240,120);
-    showEquationIfEnabled();
-    return;
-  }
-  // compare
-  let correctNow = true;
-  for (const k in current.answer){
-    const expected = current.answer[k];
-    const got = answers[k];
-    if (Math.abs(Number(got) - Number(expected)) > 1e-9) { correctNow=false; break; }
-  }
 
-  total += 1;
-  if (correctNow){
-    correct += 1;
-    score += 10;
-    streak += 1;
-    if (streak % 5 === 0){ score += 5; }
-    bestStreak = Math.max(bestStreak, streak);
-    $('#feedback').innerHTML = `<span class="ok">✔ Correct!</span>`;
-    $('#nextBtn').disabled = false;
-    beep(880,120);
-  } else {
-    streak = 0;
-    $('#feedback').innerHTML = `<span class="bad">✖ Incorrect</span>`;
-    incorrectLog.push({
-      text: current.text,
-      equation: current.equation,
-      answer: JSON.parse(JSON.stringify(current.answer)),
-      user: user,
-      diff: difficulty
-    });
-    beep(240,120);
-  }
-  showEquationIfEnabled();
-  if (timerActive) stopTimer();
-  updateStats();
-}
+    function formatUserAnswerList(problem, values) {
+      return problem.answers.map((a, i) => `${a.label}: ${values[i]}`).join("\n");
+    }
 
-function nextProblem(){
-  $('#nextBtn').disabled = true;
-  newProblem();
-}
+    let audioCtx = null;
+    function beep(success=true) {
+      if (!document.getElementById("soundToggle").checked) return;
+      try{
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const duration = success ? 0.12 : 0.16;
+        const freq = success ? 880 : 220;
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.type = "square";
+        oscillator.frequency.value = freq;
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        gainNode.gain.setValueAtTime(0.12, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        oscillator.start(now);
+        oscillator.stop(now + duration);
+      }catch(e){}
+    }
 
-function updateStats(){
-  $('#score').textContent = score;
-  $('#streak').textContent = streak;
-  const acc = total ? Math.round(100*correct/total) : 0;
-  $('#accuracy').textContent = total ? `${acc}%` : '–';
-  // summary
-  $('#sumTotal').textContent = total;
-  $('#sumCorrect').textContent = correct;
-  $('#sumAcc').textContent = total ? `${acc}%` : '0%';
-  $('#sumScore').textContent = score;
-  $('#sumStreak').textContent = bestStreak;
-  // incorrect list
-  const box = $('#incorrectList');
-  box.innerHTML = '';
-  incorrectLog.forEach((it, idx)=>{
-    const div = document.createElement('div');
-    div.className = 'ws-item';
-    const ansStr = Object.keys(it.answer).map(k=> `${k.toUpperCase()}: ${formatSpaces(it.answer[k])}`).join(', ');
-    div.innerHTML = `<div><strong>#${idx+1}</strong> ${it.text}</div>
-                     <div class="hint">Equation: ${it.equation}</div>
-                     <div><mark red>Correct</mark>: ${ansStr}</div>
-                     <button class="btn secondary" data-replay="${idx}">Review</button>`;
-    box.appendChild(div);
-  });
-  box.querySelectorAll('button[data-replay]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const i = parseInt(btn.dataset.replay,10);
-      const it = incorrectLog[i];
-      current = {
-        text: it.text, equation: it.equation, answer: it.answer,
-        inputs: Object.keys(it.answer).length===2
-          ? [{label:'First value', key:'a'},{label:'Second value', key:'b'}]
-          : [{label:'Answer', key:'a'}],
-        steps: ['(Review) Recreate the equation from the statement above and solve again.','Check units and operations.','Confirm the final value(s).'],
-        allowHalf: (difficulty==='hard')
-      };
-      $('#statement').textContent = current.text;
-      const inputsDiv = $('#inputs'); inputsDiv.innerHTML='';
-      if (Object.keys(it.answer).length===2){
-        inputsDiv.appendChild(makeInput('First value', 'a'));
-        inputsDiv.appendChild(makeInput('Second value', 'b'));
-      } else {
-        inputsDiv.appendChild(makeInput('Answer', 'a'));
+    function normalizeProblem(problem) {
+      if (!problem.answers) {
+        problem.answers = [{ label: "Answer", value: problem.answer }];
       }
-      $('#feedback').textContent='';
-      $('#steps').style.display='none'; $('#equationReveal').style.display='none';
-      $('#equationText').textContent=''; $('#stepsBody').innerHTML='';
-      $('#nextBtn').disabled=true;
-      const first = inputsDiv.querySelector('input'); if (first) first.focus();
+      if (typeof problem.answer === "undefined") {
+        problem.answer = problem.answers[0].value;
+      }
+      return problem;
+    }
+
+    const easyGenerators = [
+      function(){
+        const a = choice([2,3,4,5]);
+        const b = randInt(1,10);
+        const targetQuotient = randInt(2,30);
+        const shownResult = targetQuotient + b;
+        const answer = targetQuotient * a;
+        const q = `If you divide a number by ${a} and then add ${b}, you get ${formatNumber(shownResult)}.\nWhat is the number?`;
+        const steps =
+`Let the number be x.
+
+x ÷ ${a} + ${b} = ${formatNumber(shownResult)}
+x ÷ ${a} = ${formatNumber(shownResult)} - ${b} = ${formatNumber(shownResult - b)}
+x = ${formatNumber(shownResult - b)} × ${a} = ${formatNumber(answer)}`;
+        return normalizeProblem({
+          question:q,
+          answer:answer,
+          steps,
+          tier:"easy"
+        });
+      },
+
+      function(){
+        const height = choice([4,5,6,8]);
+        const base = randInt(4,20);
+        const area = (base * height) / 2;
+        const q = `A triangle has an area of ${formatNumber(area)} cm² and a height of ${formatNumber(height)} cm.\nThe base is x cm long.\nHow long is the base?`;
+        const steps =
+`Area of a triangle: A = (base × height) ÷ 2
+
+${formatNumber(area)} = (x × ${formatNumber(height)}) ÷ 2
+Multiply both sides by 2:
+2 × ${formatNumber(area)} = x × ${formatNumber(height)}
+x = (2 × ${formatNumber(area)}) ÷ ${formatNumber(height)} = ${formatNumber(base)} cm`;
+        return normalizeProblem({
+          question:q,
+          answer:base,
+          steps,
+          tier:"easy"
+        });
+      },
+
+      function(){
+        const sweet = randInt(2,7);
+        const iceCream = randInt(15,25);
+        const total = iceCream + 5 * sweet;
+        const q = `An ice cream and five pieces of candy cost ${formatNumber(total)} kr together.\nThe ice cream costs ${formatNumber(iceCream)} kr.\nHow much does one piece of candy cost?`;
+        const steps =
+`Let x be the price of one piece of candy.
+
+${formatNumber(iceCream)} + 5x = ${formatNumber(total)}
+5x = ${formatNumber(total)} - ${formatNumber(iceCream)} = ${formatNumber(total-iceCream)}
+x = ${formatNumber(total-iceCream)} ÷ 5 = ${formatNumber(sweet)} kr`;
+        return normalizeProblem({
+          question:q,
+          answer:sweet,
+          steps,
+          tier:"easy"
+        });
+      },
+
+      function(){
+        const x = randInt(2,8);
+        const w = x;
+        const l = 3*x;
+        const perimeter = 2*(w+l);
+        const q = `The width of a rectangle is x cm and the length is 3x cm.\nThe perimeter of the rectangle is ${formatNumber(perimeter)} cm.\nHow long is one of the short sides (the width)?`;
+        const steps =
+`Perimeter P = 2 × (length + width)
+
+${formatNumber(perimeter)} = 2 × (3x + x) = 2 × 4x = 8x
+x = ${formatNumber(perimeter)} ÷ 8 = ${formatNumber(x)} cm`;
+        return normalizeProblem({
+          question:q,
+          answer:x,
+          steps,
+          tier:"easy"
+        });
+      },
+
+      function(){
+        const percent = choice([25, 40, 60]);
+        let total;
+
+        if (percent === 25) {
+          total = randInt(20, 80) * 4;
+        } else {
+          total = randInt(20, 80) * 5;
+        }
+
+        const trained = total * percent / 100;
+
+        const q = `In a survey, ${percent}% of the people said that they exercise regularly.\nThat corresponds to ${formatNumber(trained)} people.\nHow many people were in the survey in total?`;
+        const steps =
+`Let N be the total number of people.
+
+${percent}% of N = ${formatNumber(trained)}
+${percent}/100 × N = ${formatNumber(trained)}
+N = ${formatNumber(trained)} × 100 ÷ ${percent} = ${formatNumber(total)}`;
+        return normalizeProblem({
+          question:q,
+          answer:total,
+          steps,
+          tier:"easy"
+        });
+      },
+
+      function(){
+        const jacob = randInt(7,15);
+        const diff = randInt(3,8);
+        const filip = jacob + diff;
+        const total = jacob + filip;
+        const q = `Filip is ${diff} years older than Jacob.\nTogether they are ${formatNumber(total)} years old.\nHow old are Jacob and Filip?`;
+        const steps =
+`Let x be Jacob's age.
+
+Filip is x + ${diff}
+
+x + (x + ${diff}) = ${formatNumber(total)}
+2x + ${diff} = ${formatNumber(total)}
+2x = ${formatNumber(total)} - ${diff} = ${formatNumber(total-diff)}
+x = ${formatNumber(jacob)}
+
+So:
+Jacob = ${formatNumber(jacob)} years
+Filip = ${formatNumber(filip)} years`;
+        return normalizeProblem({
+          question:q,
+          answers:[
+            { label:"Jacob", value:jacob },
+            { label:"Filip", value:filip }
+          ],
+          steps,
+          tier:"easy"
+        });
+      }
+    ];
+
+    const mediumGenerators = [
+      function(){
+        const letterWeight = randInt(10,40);
+        const lettersCount = 6;
+        const packageWeight = randInt(400,800);
+        const total = lettersCount * letterWeight + packageWeight;
+        const q = `Six letters and one package together weigh ${formatNumber(total)} g.\nThe package alone weighs ${formatNumber(packageWeight)} g.\nAll letters have the same weight.\nHow much does one letter weigh?`;
+        const steps =
+`Let x be the weight of one letter.
+
+${lettersCount}x + ${formatNumber(packageWeight)} = ${formatNumber(total)}
+${lettersCount}x = ${formatNumber(total)} - ${formatNumber(packageWeight)} = ${formatNumber(total-packageWeight)}
+x = ${formatNumber(total-packageWeight)} ÷ ${lettersCount} = ${formatNumber(letterWeight)} g`;
+        return normalizeProblem({
+          question:q,
+          answer:letterWeight,
+          steps,
+          tier:"medium"
+        });
+      },
+
+      function(){
+        const factor = randInt(4,7);
+        const child = randInt(5,15);
+        const father = factor * child;
+        const extra = father - child;
+        const q = `Sara's father is ${factor} times as old as Sara.\nHe is also ${extra} years older than Sara.\nHow old are they?`;
+        const steps =
+`Let x be Sara's age.
+
+Father is ${factor}x and also x + ${extra}
+
+${factor}x = x + ${extra}
+${factor}x - x = ${extra}
+${factor-1}x = ${extra}
+x = ${extra} ÷ ${factor-1} = ${formatNumber(child)}
+
+So:
+Sara = ${formatNumber(child)} years
+Father = ${formatNumber(father)} years`;
+        return normalizeProblem({
+          question:q,
+          answers:[
+            { label:"Sara", value:child },
+            { label:"Father", value:father }
+          ],
+          steps,
+          tier:"medium"
+        });
+      },
+
+      function(){
+        const original = randInt(400,1200) * 10;
+        const diff = original * 0.30;
+        const q = `The price of a sofa was lowered by 30% and became ${formatNumber(diff)} kr cheaper.\nWhat was the price of the sofa before the reduction?`;
+        const steps =
+`Let P be the original price.
+
+30% of P = ${formatNumber(diff)}
+0.30P = ${formatNumber(diff)}
+P = ${formatNumber(diff)} ÷ 0.30 = ${formatNumber(original)} kr`;
+        return normalizeProblem({
+          question:q,
+          answer:original,
+          steps,
+          tier:"medium"
+        });
+      },
+
+      function(){
+        const x = randInt(5,20);
+        const b = 3*x;
+        const c = x + 15;
+        const total = x + b + c;
+        const q = `Three boxes contain marbles.\nBox A has x marbles, box B has three times as many as box A, and box C has 15 more marbles than box A.\nAltogether there are ${formatNumber(total)} marbles.\nHow many marbles are in box A?`;
+        const steps =
+`Let x be the number of marbles in box A.
+
+Box B: 3x
+Box C: x + 15
+
+x + 3x + (x + 15) = ${formatNumber(total)}
+5x + 15 = ${formatNumber(total)}
+5x = ${formatNumber(total)} - 15 = ${formatNumber(total-15)}
+x = ${formatNumber(total-15)} ÷ 5 = ${formatNumber(x)}`;
+        return normalizeProblem({
+          question:q,
+          answer:x,
+          steps,
+          tier:"medium"
+        });
+      },
+
+      function(){
+        const longSide = randInt(8,20);
+        const triangleBase = longSide - 3;
+        const q = `A rectangle and an isosceles triangle have related side lengths.\nThe base of the triangle is 3 cm shorter than the long side of the rectangle.\nThe long side of the rectangle is ${formatNumber(longSide)} cm.\nHow long is the base of the triangle?`;
+        const steps =
+`Let x be the base of the triangle.
+
+x + 3 = ${formatNumber(longSide)}
+x = ${formatNumber(longSide)} - 3 = ${formatNumber(triangleBase)} cm`;
+        return normalizeProblem({
+          question:q,
+          answer:triangleBase,
+          steps,
+          tier:"medium"
+        });
+      },
+
+      function(){
+        const first = randInt(10,35) * 2;
+        const second = first + 2;
+        const third = first + 4;
+        const sum = first + second + third;
+        const q = `The sum of three consecutive even numbers is ${formatNumber(sum)}.\nWhat are the three numbers?`;
+        const steps =
+`Let x be the smallest even number.
+
+The next two consecutive even numbers are x + 2 and x + 4.
+
+x + (x + 2) + (x + 4) = ${formatNumber(sum)}
+3x + 6 = ${formatNumber(sum)}
+3x = ${formatNumber(sum)} - 6 = ${formatNumber(sum-6)}
+x = ${formatNumber(sum-6)} ÷ 3 = ${formatNumber(first)}
+
+So the three numbers are:
+${formatNumber(first)}, ${formatNumber(second)}, ${formatNumber(third)}`;
+        return normalizeProblem({
+          question:q,
+          answers:[
+            { label:"Smallest even number", value:first },
+            { label:"Next even number", value:second },
+            { label:"Largest even number", value:third }
+          ],
+          steps,
+          tier:"medium"
+        });
+      },
+
+      function(){
+        const yearsAgo = randInt(3,7);
+        const fredNow = 2 * yearsAgo;
+        const lisaNow = 4 * fredNow;
+        const q = `Lisa is four times as old as her son Fredrik.\n${yearsAgo} years ago she was seven times as old as he was.\nHow old are they now?`;
+        const steps =
+`Let x be Fredrik's age now.
+
+Lisa is 4x.
+
+${yearsAgo} years ago:
+Fredrik: x - ${yearsAgo}
+Lisa: 4x - ${yearsAgo}
+
+At that time Lisa was seven times as old:
+4x - ${yearsAgo} = 7(x - ${yearsAgo})
+4x - ${yearsAgo} = 7x - ${7*yearsAgo}
+Move terms:
+-3x + ${6*yearsAgo} = 0
+3x = ${6*yearsAgo}
+x = ${6*yearsAgo} ÷ 3 = ${formatNumber(fredNow)}
+
+So:
+Fredrik = ${formatNumber(fredNow)} years
+Lisa = ${formatNumber(lisaNow)} years`;
+        return normalizeProblem({
+          question:q,
+          answers:[
+            { label:"Fredrik", value:fredNow },
+            { label:"Lisa", value:lisaNow }
+          ],
+          steps,
+          tier:"medium"
+        });
+      }
+    ];
+
+    const hardGenerators = [
+      function(){
+        const original = randInt(500,2000) * 4;
+        const spent = (3/4) * original;
+        const q = `Elin used three quarters of her money to buy a bicycle for ${formatNumber(spent)} kr.\nHow much money did Elin have to begin with?`;
+        const steps =
+`Let x be the amount of money Elin had.
+
+She spent 3/4 of it on the bicycle:
+(3/4)x = ${formatNumber(spent)}
+
+x = ${formatNumber(spent)} × 4 ÷ 3 = ${formatNumber(original)} kr`;
+        return normalizeProblem({
+          question:q,
+          answer:original,
+          steps,
+          tier:"hard"
+        });
+      },
+
+      function(){
+        const first = 39;
+        const second = 26;
+        const q = `The number 65 is split into two smaller numbers.\nIf you multiply the first number by 2 and the second number by 3, the results are the same.\nWhat are the two numbers?`;
+        const steps =
+`Let x be the first number.
+Then the second number is 65 - x.
+
+Because 2 × (first number) = 3 × (second number):
+2x = 3(65 - x)
+2x = 195 - 3x
+5x = 195
+x = 39
+
+So:
+First number = 39
+Second number = 26`;
+        return normalizeProblem({
+          question:q,
+          answers:[
+            { label:"First number", value:first },
+            { label:"Second number", value:second }
+          ],
+          steps,
+          tier:"hard"
+        });
+      },
+
+      function(){
+        const moa = randInt(4,10);
+        const maria = 5 * moa;
+        const given = 2 * moa;
+        const q = `Maria had five times as many Star Wars cards as Moa.\nThen she gave ${given} cards to Moa.\nAfter that they had the same number of cards.\nHow many cards did each of them have at the beginning?`;
+        const steps =
+`Let x be Moa's original number of cards.
+
+Maria had 5x cards.
+
+After giving ${given} cards:
+Maria: 5x - ${given}
+Moa: x + ${given}
+
+They then have the same number:
+5x - ${given} = x + ${given}
+5x - x = ${given} + ${given}
+4x = ${2*given}
+x = ${2*given} ÷ 4 = ${formatNumber(moa)}
+
+So:
+Moa = ${formatNumber(moa)} cards
+Maria = ${formatNumber(maria)} cards`;
+        return normalizeProblem({
+          question:q,
+          answers:[
+            { label:"Moa", value:moa },
+            { label:"Maria", value:maria }
+          ],
+          steps,
+          tier:"hard"
+        });
+      },
+
+      function(){
+        const a = randInt(20,200);
+        const b = 2*a + 12;
+        const total = a + b;
+        const q = `Bag B contains twice as much money as bag A, plus an extra 12 kr.\nTogether the two bags contain ${formatNumber(total)} kr.\nHow much money is in each bag?`;
+        const steps =
+`Let x be the amount in bag A.
+
+Bag B has 2x + 12.
+
+x + (2x + 12) = ${formatNumber(total)}
+3x + 12 = ${formatNumber(total)}
+3x = ${formatNumber(total)} - 12 = ${formatNumber(total-12)}
+x = ${formatNumber(total-12)} ÷ 3 = ${formatNumber(a)}
+
+So:
+Bag A = ${formatNumber(a)} kr
+Bag B = ${formatNumber(b)} kr`;
+        return normalizeProblem({
+          question:q,
+          answers:[
+            { label:"Bag A", value:a },
+            { label:"Bag B", value:b }
+          ],
+          steps,
+          tier:"hard"
+        });
+      },
+
+      function(){
+        const anna = randInt(70,120);
+        const john = anna + 10;
+        const hours = 40;
+        const total = hours*anna + hours*john;
+        const q = `John and Anna work at a café.\nJohn has worked there longer than Anna and earns 10 kr more per hour than she does.\nIn a week when they each work ${hours} hours, they earn ${formatNumber(total)} kr altogether.\nWhat is the hourly wage for John and for Anna?`;
+        const steps =
+`Let x be Anna's hourly wage.
+
+John earns x + 10.
+
+Together in a ${hours}-hour week:
+${hours}x + ${hours}(x + 10) = ${formatNumber(total)}
+${2*hours}x + ${hours*10} = ${formatNumber(total)}
+${2*hours}x = ${formatNumber(total)} - ${hours*10}
+${2*hours}x = ${formatNumber(total - hours*10)}
+x = ${formatNumber(total - hours*10)} ÷ ${2*hours} = ${formatNumber(anna)}
+
+So:
+Anna = ${formatNumber(anna)} kr/hour
+John = ${formatNumber(john)} kr/hour`;
+        return normalizeProblem({
+          question:q,
+          answers:[
+            { label:"Anna", value:anna },
+            { label:"John", value:john }
+          ],
+          steps,
+          tier:"hard"
+        });
+      },
+
+      function(){
+        const original = randInt(3000,9000);
+        const afterPercent = original * 0.75;
+        const secondCut = randInt(20,200);
+        const final = afterPercent - secondCut;
+        const q = `The price of a film camera is first reduced by 25%.\nLater the price is reduced by another ${formatNumber(secondCut)} kr.\nThe camera now costs ${formatNumber(final)} kr.\nWhat was the original price?`;
+        const steps =
+`Let P be the original price.
+
+After a 25% reduction:
+Price becomes 75% of P = 0.75P
+
+Then the store subtracts ${formatNumber(secondCut)} kr:
+0.75P - ${formatNumber(secondCut)} = ${formatNumber(final)}
+
+0.75P = ${formatNumber(final)} + ${formatNumber(secondCut)} = ${formatNumber(final+secondCut)}
+P = ${formatNumber(final+secondCut)} ÷ 0.75 = ${formatNumber(original)} kr`;
+        return normalizeProblem({
+          question:q,
+          answer:original,
+          steps,
+          tier:"hard"
+        });
+      },
+
+      function(){
+        const num5 = randInt(4,15);
+        const num10 = randInt(4,15);
+        const totalCoins = num5 + num10;
+        const totalValue = num5*5 + num10*10;
+        const q = `Yining has only 5-kr and 10-kr coins.\nIn total there are ${formatNumber(totalCoins)} coins, worth ${formatNumber(totalValue)} kr.\nHow many coins of each type does Yining have?`;
+        const steps =
+`Let x be the number of 5-kr coins.
+
+Then the number of 10-kr coins is ${totalCoins} - x.
+
+Total value:
+5x + 10(${totalCoins} - x) = ${formatNumber(totalValue)}
+5x + ${10*totalCoins} - 10x = ${formatNumber(totalValue)}
+-5x + ${10*totalCoins} = ${formatNumber(totalValue)}
+-5x = ${formatNumber(totalValue)} - ${10*totalCoins}
+-5x = ${formatNumber(totalValue - 10*totalCoins)}
+x = ${formatNumber(num5)}
+
+So:
+5-kr coins = ${formatNumber(num5)}
+10-kr coins = ${formatNumber(num10)}`;
+        return normalizeProblem({
+          question:q,
+          answers:[
+            { label:"5-kr coins", value:num5 },
+            { label:"10-kr coins", value:num10 }
+          ],
+          steps,
+          tier:"hard"
+        });
+      },
+
+      function(){
+        const scooterOriginal = randInt(6000,12000);
+        const helmet = randInt(300,800);
+        const totalPaid = scooterOriginal * 0.90 + helmet;
+        const q = `Li bought a moped that was on sale with a 10% discount off the original price.\nShe also bought a helmet for ${formatNumber(helmet)} kr.\nIn total she paid ${formatNumber(totalPaid)} kr.\nWhat was the original price of the moped?`;
+        const steps =
+`Let P be the original price of the moped.
+
+The sale price is 90% of P:
+0.90P
+
+She also buys a helmet for ${formatNumber(helmet)} kr:
+0.90P + ${formatNumber(helmet)} = ${formatNumber(totalPaid)}
+
+0.90P = ${formatNumber(totalPaid)} - ${formatNumber(helmet)} = ${formatNumber(totalPaid-helmet)}
+P = ${formatNumber(totalPaid-helmet)} ÷ 0.90 = ${formatNumber(scooterOriginal)} kr`;
+        return normalizeProblem({
+          question:q,
+          answer:scooterOriginal,
+          steps,
+          tier:"hard"
+        });
+      },
+
+      function(){
+        const youthTickets = randInt(40,120);
+        const adultTickets = youthTickets * 2;
+        const adultPrice = 50;
+        const youthPrice = 20;
+        const totalMoney = adultTickets*adultPrice + youthTickets*youthPrice;
+        const q = `For a football match, the club sold twice as many adult tickets as youth tickets.\nAdult tickets cost ${formatNumber(adultPrice)} kr and youth tickets cost ${formatNumber(youthPrice)} kr.\nAltogether the ticket sales brought in ${formatNumber(totalMoney)} kr.\nHow many tickets were sold in total?`;
+        const steps =
+`Let x be the number of youth tickets.
+
+Adult tickets: 2x
+
+Total money:
+${adultPrice}(2x) + ${youthPrice}x = ${formatNumber(totalMoney)}
+${2*adultPrice}x + ${youthPrice}x = ${formatNumber(totalMoney)}
+${2*adultPrice + youthPrice}x = ${formatNumber(totalMoney)}
+x = ${formatNumber(totalMoney)} ÷ ${2*adultPrice + youthPrice} = ${formatNumber(youthTickets)}
+
+Total tickets = x + 2x = 3x = ${formatNumber(adultTickets + youthTickets)}`;
+        return normalizeProblem({
+          question:q,
+          answer:adultTickets + youthTickets,
+          steps,
+          tier:"hard"
+        });
+      }
+    ];
+
+    function generateProblem(tier) {
+      let actualTier = tier;
+      if (tier === "mixed") {
+        actualTier = choice(["easy","medium","hard"]);
+      }
+
+      let genArr;
+      if (actualTier === "easy") genArr = easyGenerators;
+      else if (actualTier === "medium") genArr = mediumGenerators;
+      else genArr = hardGenerators;
+
+      const gen = choice(genArr);
+      const problem = normalizeProblem(gen());
+      problem.tier = actualTier;
+      return problem;
+    }
+
+    let currentTier = "easy";
+    let currentProblem = null;
+    let waitingForNext = false;
+
+    const stats = {
+      total:0,
+      correct:0,
+      streak:0,
+      bestStreak:0,
+      score:0,
+      incorrect:[]
+    };
+
+    let timerEnabled = false;
+    let timerSeconds = 60;
+    let timerRemaining = null;
+    let timerId = null;
+
+    function resetTimer() {
+      const display = document.getElementById("timerDisplay");
+      if (!timerEnabled) {
+        timerRemaining = null;
+        display.textContent = "--";
+        display.classList.remove("active");
+        if (timerId) clearInterval(timerId);
+        timerId = null;
+        return;
+      }
+      if (timerId) clearInterval(timerId);
+      timerRemaining = timerSeconds;
+      display.textContent = timerRemaining + " s";
+      display.classList.add("active");
+      timerId = setInterval(()=>{
+        timerRemaining--;
+        if (timerRemaining <= 0) {
+          timerRemaining = 0;
+          display.textContent = "0 s";
+          clearInterval(timerId);
+          timerId = null;
+          if (!waitingForNext) {
+            handleTimeout();
+          }
+          return;
+        }
+        display.textContent = timerRemaining + " s";
+      },1000);
+    }
+
+    function updateDifficultyTag(tier){
+      const tag = document.getElementById("difficultyTag");
+      const label = document.getElementById("difficultyLabel");
+      tag.classList.remove("easy","medium","hard");
+      if (tier === "easy") {
+        tag.classList.add("easy");
+        label.textContent = "Easy question";
+      } else if (tier === "medium") {
+        tag.classList.add("medium");
+        label.textContent = "Medium question";
+      } else {
+        tag.classList.add("hard");
+        label.textContent = "Hard question";
+      }
+    }
+
+    function renderAnswerFields(problem) {
+      const container = document.getElementById("answerFields");
+      container.innerHTML = "";
+
+      problem.answers.forEach((ans, index) => {
+        const group = document.createElement("div");
+        group.className = "answer-field-group";
+
+        const label = document.createElement("label");
+        label.className = "answer-label";
+        const inputId = "answerInput_" + index;
+        label.setAttribute("for", inputId);
+        label.textContent = ans.label;
+
+        const input = document.createElement("input");
+        input.id = inputId;
+        input.className = "answer-input";
+        input.autocomplete = "off";
+        input.inputMode = "decimal";
+        input.setAttribute("aria-label", ans.label);
+
+        input.addEventListener("keydown", (e)=>{
+          if (e.key === "Enter") {
+            e.preventDefault();
+            handleSubmit();
+          } else if (e.key === "Escape") {
+            e.preventDefault();
+            input.value = "";
+          }
+        });
+
+        group.appendChild(label);
+        group.appendChild(input);
+        container.appendChild(group);
+      });
+    }
+
+    function getAnswerInputs() {
+      return Array.from(document.querySelectorAll("#answerFields .answer-input"));
+    }
+
+    function getUserAnswerState() {
+      const inputs = getAnswerInputs();
+      const rawValues = inputs.map(i => i.value.trim());
+      const parsedValues = rawValues.map(v => parseAnswer(v));
+      const allBlank = rawValues.every(v => v === "");
+      const anyBlank = rawValues.some(v => v === "");
+      const anyInvalid = parsedValues.some(v => !isFinite(v));
+      return { inputs, rawValues, parsedValues, allBlank, anyBlank, anyInvalid };
+    }
+
+    function newQuestion() {
+      currentProblem = generateProblem(currentTier);
+      document.getElementById("questionText").textContent = currentProblem.question;
+      document.getElementById("feedback").textContent = "";
+      document.getElementById("feedback").className = "feedback";
+      document.getElementById("correctAnswer").textContent = "";
+      document.getElementById("stepsPanel").classList.add("hidden");
+      document.getElementById("showStepsBtn").classList.add("hidden");
+      waitingForNext = false;
+      document.getElementById("submitBtn").disabled = false;
+      document.getElementById("nextBtn").disabled = true;
+      updateDifficultyTag(currentProblem.tier);
+      renderAnswerFields(currentProblem);
+      resetTimer();
+      const firstInput = getAnswerInputs()[0];
+      if (firstInput) firstInput.focus();
+    }
+
+    function updateStatsDisplay(){
+      document.getElementById("statTotal").textContent = stats.total;
+      document.getElementById("statCorrect").textContent = stats.correct;
+      const accuracy = stats.total === 0 ? 0 : Math.round(100*stats.correct/stats.total);
+      document.getElementById("statAccuracy").textContent = accuracy + "%";
+      document.getElementById("statStreak").textContent = stats.streak;
+      document.getElementById("statBestStreak").textContent = stats.bestStreak;
+      document.getElementById("statScore").textContent = stats.score;
+
+      const panel = document.getElementById("incorrectPanel");
+      panel.innerHTML = "";
+      stats.incorrect.forEach((item,idx)=>{
+        const div = document.createElement("div");
+        div.className = "incorrect-item";
+
+        const q = document.createElement("div");
+        q.className = "incorrect-q";
+        q.textContent = (idx+1)+". "+item.question.replace(/\n/g," ");
+
+        const a = document.createElement("div");
+        a.className = "incorrect-a";
+        a.textContent = "Your answer:\n" + item.yourAnswer + "\nCorrect:\n" + item.correctAnswer;
+
+        div.appendChild(q);
+        div.appendChild(a);
+        panel.appendChild(div);
+      });
+    }
+
+    function stopTimerIfRunning() {
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+    }
+
+    function handleTimeout(){
+      const fb = document.getElementById("feedback");
+      const ca = document.getElementById("correctAnswer");
+      const showStepsBtn = document.getElementById("showStepsBtn");
+      const stepsPanel = document.getElementById("stepsPanel");
+      const state = getUserAnswerState();
+
+      stats.total++;
+      stats.streak = 0;
+      updateStatsDisplay();
+
+      fb.textContent = "Time is up.";
+      fb.className = "feedback incorrect";
+      ca.textContent = "Correct answer(s):\n" + formatAnswerList(currentProblem);
+
+      stats.incorrect.push({
+        question: currentProblem.question,
+        yourAnswer: state.allBlank ? "(no answer, time up)" : formatUserAnswerList(currentProblem, state.rawValues.map(v => v === "" ? "(blank)" : v)),
+        correctAnswer: formatAnswerList(currentProblem)
+      });
+
+      showStepsBtn.classList.remove("hidden");
+      stepsPanel.classList.add("hidden");
+      waitingForNext = true;
+      document.getElementById("nextBtn").disabled = false;
+      document.getElementById("submitBtn").disabled = true;
+      beep(false);
+      updateStatsDisplay();
+    }
+
+    function handleSubmit(){
+      if (waitingForNext) {
+        nextQuestion();
+        return;
+      }
+
+      const fb = document.getElementById("feedback");
+      const ca = document.getElementById("correctAnswer");
+      const showStepsBtn = document.getElementById("showStepsBtn");
+      const stepsPanel = document.getElementById("stepsPanel");
+      const state = getUserAnswerState();
+
+      if (state.anyBlank) {
+        fb.textContent = currentProblem.answers.length === 1
+          ? "Please enter a number."
+          : "Please enter a number in every answer field.";
+        fb.className = "feedback";
+        return;
+      }
+
+      if (state.anyInvalid) {
+        fb.textContent = "Please enter valid number(s).";
+        fb.className = "feedback";
+        return;
+      }
+
+      stats.total++;
+
+      const isCorrect = currentProblem.answers.every((ans, i) => {
+        return Math.abs(state.parsedValues[i] - ans.value) < 0.01;
+      });
+
+      if (isCorrect) {
+        fb.textContent = "Correct!";
+        fb.className = "feedback correct";
+        ca.textContent = "";
+        stats.correct++;
+        stats.streak++;
+        if (stats.streak > stats.bestStreak) stats.bestStreak = stats.streak;
+        stats.score += 10;
+        if (stats.streak > 0 && stats.streak % 5 === 0) stats.score += 5;
+        beep(true);
+      } else {
+        fb.textContent = "Incorrect.";
+        fb.className = "feedback incorrect";
+        ca.textContent = "Correct answer(s):\n" + formatAnswerList(currentProblem);
+        stats.streak = 0;
+        stats.incorrect.push({
+          question: currentProblem.question,
+          yourAnswer: formatUserAnswerList(currentProblem, state.rawValues),
+          correctAnswer: formatAnswerList(currentProblem)
+        });
+        showStepsBtn.classList.remove("hidden");
+        stepsPanel.classList.add("hidden");
+        beep(false);
+      }
+
+      updateStatsDisplay();
+      waitingForNext = true;
+      document.getElementById("nextBtn").disabled = false;
+      document.getElementById("submitBtn").disabled = true;
+      stopTimerIfRunning();
+    }
+
+    function nextQuestion(){
+      newQuestion();
+    }
+
+    function worksheetAnswerText(problem) {
+      if (problem.answers.length === 1) {
+        return formatNumber(problem.answers[0].value);
+      }
+      return problem.answers.map(a => `${a.label}: ${formatNumber(a.value)}`).join(" | ");
+    }
+
+    function generateWorksheet(){
+      const count = Number(document.getElementById("worksheetCount").value);
+      const output = document.getElementById("worksheetOutput");
+      const diff = currentTier;
+      const problems = [];
+
+      for (let i=0;i<count;i++){
+        problems.push(generateProblem(diff));
+      }
+
+      output.innerHTML = "";
+
+      const h3 = document.createElement("h3");
+      h3.textContent = "Worksheet – " + (diff==="mixed" ? "Mixed difficulties" : diff.charAt(0).toUpperCase()+diff.slice(1));
+      output.appendChild(h3);
+
+      const inst = document.createElement("p");
+      inst.textContent = "Solve the problems by writing and solving an equation for each situation.";
+      output.appendChild(inst);
+
+      const ol = document.createElement("ol");
+      problems.forEach(p=>{
+        const li = document.createElement("li");
+        li.textContent = p.question.replace(/\n/g," ");
+        ol.appendChild(li);
+      });
+      output.appendChild(ol);
+
+      const key = document.createElement("div");
+      key.className = "answer-key hidden";
+      key.id = "worksheetKey";
+
+      const h4 = document.createElement("h4");
+      h4.textContent = "Answer key";
+      key.appendChild(h4);
+
+      const keyOl = document.createElement("ol");
+      problems.forEach((p)=>{
+        const li = document.createElement("li");
+        li.textContent = worksheetAnswerText(p);
+        keyOl.appendChild(li);
+      });
+      key.appendChild(keyOl);
+      output.appendChild(key);
+
+      output.dataset.generated = "1";
+    }
+
+    function toggleWorksheetAnswers(){
+      const output = document.getElementById("worksheetOutput");
+      if (output.dataset.generated !== "1") return;
+      const key = document.getElementById("worksheetKey");
+      const btn = document.getElementById("toggleAnswersBtn");
+      if (key.classList.contains("hidden")) {
+        key.classList.remove("hidden");
+        btn.textContent = "Hide answers";
+      } else {
+        key.classList.add("hidden");
+        btn.textContent = "Reveal answers";
+      }
+    }
+
+    function setMode(mode){
+      const gameCard = document.getElementById("gameCard");
+      const worksheetSection = document.getElementById("worksheetSection");
+      const modeBtns = document.querySelectorAll(".mode-btn");
+
+      modeBtns.forEach(btn=>{
+        btn.classList.toggle("active", btn.dataset.mode === mode);
+      });
+
+      if (mode === "game"){
+        gameCard.style.display = "";
+        worksheetSection.classList.add("hidden");
+      } else {
+        gameCard.style.display = "";
+        worksheetSection.classList.remove("hidden");
+      }
+    }
+
+    document.querySelectorAll(".chip").forEach(chip=>{
+      chip.addEventListener("click", ()=>{
+        document.querySelectorAll(".chip").forEach(c=>c.classList.remove("active"));
+        chip.classList.add("active");
+        currentTier = chip.dataset.diff;
+        newQuestion();
+      });
     });
-  });
-  $('#summary').hidden = (total===0);
-}
 
-/** ===================== Worksheet ===================== **/
-$('#wsGenerate').addEventListener('click', ()=>{
-  const n = parseInt($('#wsSize').value,10);
-  renderWorksheet(n);
-});
-$('#wsRevealAll').addEventListener('click', ()=>{
-  $$('#wsList .ws-ans').forEach(x=> x.classList.add('show'));
-});
-$('#wsHideAll').addEventListener('click', ()=>{
-  $$('#wsList .ws-ans').forEach(x=> x.classList.remove('show'));
-});
-
-function renderWorksheet(n){
-  const list = $('#wsList');
-  list.innerHTML = '';
-  for (let i=1;i<=n;i++){
-    const diff = (difficulty==='rand' ? choice(['easy','med','hard']) : difficulty);
-    const prob = makeProblem(diff);
-    const item = document.createElement('div'); item.className = 'ws-item';
-    const eqPart = $('#wsShowEq').checked ? `<div class="hint">Equation: ${prob.equation}</div>` : '';
-    const ansStr = Object.keys(prob.answer).length===2
-      ? `${Object.keys(prob.answer)[0].toUpperCase()}: ${formatSpaces(prob.answer.a)}, ${Object.keys(prob.answer)[1].toUpperCase()}: ${formatSpaces(prob.answer.b)}`
-      : `${formatSpaces(prob.answer.a)}`;
-    item.innerHTML = `
-      <h4>${i}. ${prob.text}</h4>
-      <div class="small">Difficulty: ${diff==='easy'?'🟢':'med'===diff?'🟡':'🔴'}</div>
-      ${eqPart}
-      <div class="ws-ans"><strong>Answer:</strong> ${ansStr}<br>
-        <div class="hint">${prob.steps.map(s=>'• '+s).join('<br>')}</div>
-      </div>
-      <div class="row">
-        <button class="btn secondary ws-toggle">Reveal</button>
-      </div>`;
-    const ansBox = item.querySelector('.ws-ans');
-    item.querySelector('.ws-toggle').addEventListener('click', (e)=>{
-      const show = !ansBox.classList.contains('show');
-      ansBox.classList.toggle('show', show);
-      e.target.textContent = show ? 'Hide' : 'Reveal';
+    document.querySelectorAll(".mode-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        setMode(btn.dataset.mode);
+      });
     });
-    list.appendChild(item);
-  }
-}
 
-/** ===================== Init ===================== **/
-(function init(){
-  $('#seedInfo').textContent = `seed=${seed}`;
-  setDifficulty('easy');
-  const d = getParam('diff'); if (d && ['easy','med','hard','rand'].includes(d)) setDifficulty(d);
-  if (devMode) runDevTests();
-})();
+    document.getElementById("submitBtn").addEventListener("click", handleSubmit);
+    document.getElementById("nextBtn").addEventListener("click", nextQuestion);
 
-/** ===================== Dev Tests (hidden behind ?dev=1) ===================== **/
-function assert(name, cond){
-  if (!devMode) return;
-  console.log(cond ? '✅ '+name : '❌ '+name);
-}
-function runDevTests(){
-  // Easy should keep all displayed numbers ≤ 100
-  for (let i=0;i<20;i++){
-    const p = genEasy();
-    const nums = (p.text + ' ' + p.equation + ' ' + p.steps.join(' '))
-      .match(/-?\d+(\s\d{3})*|-?\d+(\,\d+)?/g) || [];
-    const check = nums.every(s=>{
-      const v = Number(String(s).replace(/\s/g,'').replace(',','.'));
-      return Math.abs(v)<=100;
+    document.getElementById("toggleIncorrectBtn").addEventListener("click", ()=>{
+      const panel = document.getElementById("incorrectPanel");
+      if (panel.classList.contains("hidden")){
+        panel.classList.remove("hidden");
+        document.getElementById("toggleIncorrectBtn").textContent = "Hide incorrect questions";
+      } else {
+        panel.classList.add("hidden");
+        document.getElementById("toggleIncorrectBtn").textContent = "Show incorrect questions";
+      }
     });
-    assert('Easy: all numbers ≤ 100', check);
-  }
-  // Format test
-  assert('Format spaces', formatSpaces(2195)==='2 195');
-  // Hard allows .5 sometimes
-  let sawHalf=false; for (let i=0;i<50;i++){ if (genHard().allowHalf){ sawHalf=true; break; } }
-  assert('Hard sometimes allows .5', sawHalf);
-  // Timer default off
-  assert('Timer default off', !$('#toggleTimer').checked);
-  // Equation toggle exists
-  assert('Equation toggle exists', !!$('#toggleShowEquation'));
-  // Worksheet generator sanity
-  renderWorksheet(5);
-  assert('Worksheet has 5 items', $$('#wsList .ws-item').length===5);
-  console.log('%cDeveloper tests completed.','color:#22aa55;font-weight:bold;');
-}
-</script>
+
+    document.getElementById("showStepsBtn").addEventListener("click", ()=>{
+      const stepsPanel = document.getElementById("stepsPanel");
+      stepsPanel.textContent = currentProblem.steps;
+      stepsPanel.classList.remove("hidden");
+    });
+
+    document.getElementById("contrastToggle").addEventListener("change", (e)=>{
+      document.body.classList.toggle("high-contrast", e.target.checked);
+    });
+
+    document.getElementById("timerToggle").addEventListener("change", (e)=>{
+      timerEnabled = e.target.checked;
+      resetTimer();
+    });
+
+    document.getElementById("timerSelect").addEventListener("change", (e)=>{
+      timerSeconds = Number(e.target.value);
+      if (timerEnabled) resetTimer();
+    });
+
+    document.getElementById("generateWorksheetBtn").addEventListener("click", generateWorksheet);
+    document.getElementById("toggleAnswersBtn").addEventListener("click", toggleWorksheetAnswers);
+
+    function runDevTests(){
+      console.log("Running developer tests for Problem Solving with Equations…");
+
+      const tiers = ["easy", "medium", "hard"];
+      tiers.forEach(tier => {
+        let bad = [];
+        for (let i=0;i<200;i++) {
+          const p = generateProblem(tier);
+          if (!p.answers || !Array.isArray(p.answers) || p.answers.length === 0) {
+            bad.push({tier, issue:"Missing answers array", p});
+          }
+          p.answers.forEach(ans => {
+            if (!isFinite(ans.value)) {
+              bad.push({tier, issue:"Non-numeric answer", p});
+            }
+          });
+
+          if (tier === "medium" && /three consecutive even numbers/i.test(p.question)) {
+            const vals = p.answers.map(a => a.value);
+            if (!(vals[0] % 2 === 0 && vals[1] === vals[0] + 2 && vals[2] === vals[1] + 2)) {
+              bad.push({tier, issue:"Even number generator produced invalid values", p});
+            }
+          }
+
+          if (tier === "easy" && /% of the people said that they exercise regularly/i.test(p.question)) {
+            const ans = p.answers[0].value;
+            if (!Number.isInteger(ans)) {
+              bad.push({tier, issue:"Survey total is not a whole number", p});
+            }
+          }
+        }
+        console.log(tier, "bad problem count:", bad.length);
+        if (bad.length) console.log(bad);
+      });
+
+      console.log("Formatted 1234567.5 =>", formatNumber(1234567.5));
+      console.log("Parse '3,5' =>", parseAnswer("3,5"));
+      console.log("Parse '4 500' =>", parseAnswer("4 500"));
+      console.log("Parse '4 500,5' =>", parseAnswer("4 500,5"));
+
+      let mixed = [];
+      for(let i=0;i<60;i++) mixed.push(generateProblem("mixed").tier);
+      console.log("Mixed tier distribution:", mixed.reduce((acc,t)=>{acc[t]=(acc[t]||0)+1;return acc;},{}));
+
+      document.getElementById("devBanner").classList.remove("hidden");
+    }
+
+    (function init(){
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("dev") === "1") {
+        setTimeout(runDevTests,200);
+      }
+      timerEnabled = document.getElementById("timerToggle").checked;
+      timerSeconds = Number(document.getElementById("timerSelect").value);
+      setMode("game");
+      newQuestion();
+      updateStatsDisplay();
+    })();
+  </script>
 </body>
 </html>
